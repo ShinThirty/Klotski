@@ -17,12 +17,12 @@ public class Bitboard {
   /**
    * Bitboard width.
    */
-  private static int width;
+  public static int width;
 
   /**
    * Bitboard height.
    */
-  private static int height;
+  public static int height;
 
   /**
    * Bitboard value.
@@ -48,6 +48,17 @@ public class Bitboard {
    * @return     Bitboard value
    */
   public static int toValue(final int x, final int y) {
+    return 1 << getIndex(x, y);
+  }
+
+  /**
+   * Convert coordinates to bitboard index.
+   *
+   * @param x    Horizontal coordinate
+   * @param y    Vertical coordinate
+   * @return     Bitboard index
+   */
+  public static int getIndex(final int x, final int y) {
     return x + y * width;
   }
 
