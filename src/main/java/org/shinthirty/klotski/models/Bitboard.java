@@ -77,4 +77,26 @@ public class Bitboard {
     return value;
   }
 
+  /**
+   * Construct a bitboard with 1s assigned to the area defined by the following conditions:
+   * 1. Top-left corner is at (x,y)
+   * 2. Width and height of the area is defined by input parameter width and height
+   *
+   * @param x        Horizontal position of the area
+   * @param y        Vertical position of the area
+   * @param width    Width of the area
+   * @param height   Height of the area
+   * @return
+   */
+  public static Bitboard draw(final int x, final int y, final int width, final int height) {
+    int value = 0;
+    for (int i = x; i < x + width; i++) {
+      for (int j = y; j < y + height; j++) {
+        value |= toValue(i, j);
+      }
+    }
+
+    return new Bitboard(value);
+  }
+
 }

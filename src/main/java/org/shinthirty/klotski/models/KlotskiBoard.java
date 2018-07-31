@@ -19,16 +19,6 @@ import lombok.Data;
 public class KlotskiBoard {
 
   /**
-   * Hash code for the Klotski board.
-   */
-  private int hash;
-
-  /**
-   * Current state of the puzzle represented by a collection of blocks.
-   */
-  private Map<String, Block> blocks;
-
-  /**
    * Target block name.
    */
   public static String target;
@@ -37,6 +27,36 @@ public class KlotskiBoard {
    * Target block state.
    */
   public static Block targetBlock;
+
+  /**
+   * Top row.
+   */
+  public static Bitboard top;
+
+  /**
+   * Right column.
+   */
+  public static Bitboard right;
+
+  /**
+   * Bottom row.
+   */
+  public static Bitboard bottom;
+
+  /**
+   * Left column.
+   */
+  public static Bitboard left;
+
+  /**
+   * Hash code for the Klotski board.
+   */
+  private int hash;
+
+  /**
+   * Current state of the puzzle represented by a collection of blocks.
+   */
+  private Map<String, Block> blocks;
 
   /**
    * Constructor.
@@ -89,6 +109,11 @@ public class KlotskiBoard {
       String[] size = line.split(" ");
       Bitboard.width = Integer.valueOf(size[0]);
       Bitboard.height = Integer.valueOf(size[1]);
+
+      top = Bitboard.draw(0, 0, Bitboard.width, 1);
+      right = Bitboard.draw(Bitboard.width - 1, 0, 1, Bitboard.height);
+      bottom = Bitboard.draw(0, Bitboard.height - 1, Bitboard.width, 1);
+      left = Bitboard.draw(0, 0, 1, Bitboard.height);
 
       for (int i = 0; i < Bitboard.height; i++) {
         line = br.readLine();
