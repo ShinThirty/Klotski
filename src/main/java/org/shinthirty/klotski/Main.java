@@ -2,6 +2,7 @@ package org.shinthirty.klotski;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
+import com.beust.jcommander.ParameterException;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -15,10 +16,10 @@ import java.nio.charset.StandardCharsets;
  */
 public class Main implements Runnable {
 
-  @Parameter(names = { "-i", "--inputFile" }, description = "Path of input file")
+  @Parameter(names = { "-i", "--inputFile" }, description = "Path of input file", required = true)
   private String inputFile;
 
-  @Parameter(names = { "-o", "--outputFile" }, description = "Path of output file")
+  @Parameter(names = { "-o", "--outputFile" }, description = "Path of output file", required = true)
   private String outputFile;
 
   /**
@@ -28,10 +29,13 @@ public class Main implements Runnable {
    */
   public static void main(String[] args) {
     Main main = new Main();
-    JCommander.newBuilder()
-        .addObject(main)
-        .build()
-        .parse(args);
+    JCommander jc = JCommander.newBuilder().addObject(main).build();
+    try {
+      jc.parse(args);
+    } catch (ParameterException ex) {
+      jc.usage();
+      return;
+    }
 
     main.run();
   }
@@ -45,7 +49,7 @@ public class Main implements Runnable {
       String line;
       while ((line = br.readLine()) != null) {
         sb.append(line);
-        sb.append("\n");
+        sb.append('\n');
       }
     } catch (IOException ex) {
       ex.printStackTrace();

@@ -113,13 +113,12 @@ class KlotskiSolver {
     try (PrintWriter pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
         new FileOutputStream(outputFile), StandardCharsets.UTF_8)))) {
       int step = 1;
-      pw.println("Solution");
+      pw.print("Solution\n");
 
       while (!steps.isEmpty()) {
         current = steps.pop();
 
-        pw.format("%d.\n", step);
-        pw.println(current.toString());
+        pw.format("%d.\n%s\n", step, current.toString());
         step++;
       }
     } catch (FileNotFoundException ex) {
