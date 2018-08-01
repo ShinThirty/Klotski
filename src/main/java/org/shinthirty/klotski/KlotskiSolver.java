@@ -21,7 +21,7 @@ import org.shinthirty.klotski.models.KlotskiBoard;
  *
  * @author shinthirty
  */
-public class KlotskiSolver {
+class KlotskiSolver {
 
   /**
    * Visited set.
@@ -34,14 +34,21 @@ public class KlotskiSolver {
   private Deque<KlotskiBoard> unvisited;
 
   /**
+   * Output file path.
+   */
+  private String outputFile;
+
+  /**
    * Constructor.
    *
    * @param configuration    Initial configuration of klotski
+   * @param outputFile       Output file path
    */
-  public KlotskiSolver(String configuration) {
+  KlotskiSolver(String configuration, String outputFile) {
     visited = new HashSet<>(65536);
     unvisited = new ArrayDeque<>();
     unvisited.add(KlotskiBoard.parse(configuration));
+    this.outputFile = outputFile;
   }
 
   /**
@@ -67,7 +74,7 @@ public class KlotskiSolver {
   /**
    * Solve the puzzle and display the steps.
    */
-  public void solve() {
+  void solve() {
     KlotskiBoard current;
 
     while (!unvisited.isEmpty()) {
@@ -104,17 +111,15 @@ public class KlotskiSolver {
     }
 
     try (PrintWriter pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
-        new FileOutputStream("solution.txt"), StandardCharsets.UTF_8)))) {
+        new FileOutputStream(outputFile), StandardCharsets.UTF_8)))) {
       int step = 1;
       pw.println("Solution");
-      pw.println();
 
       while (!steps.isEmpty()) {
         current = steps.pop();
 
         pw.format("%d.\n", step);
         pw.println(current.toString());
-        pw.println();
         step++;
       }
     } catch (FileNotFoundException ex) {

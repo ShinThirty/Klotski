@@ -294,7 +294,6 @@ public class KlotskiBoard {
         }
 
         pw.print('\n');
-        pw.println();
       }
     }
 
