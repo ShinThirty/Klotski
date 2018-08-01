@@ -10,7 +10,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class Grid extends Bitboard {
+class Grid extends Bitboard {
 
   /**
    * Horizontal coordinates of the grid.
@@ -28,7 +28,7 @@ public class Grid extends Bitboard {
    * @param x    Horizontal coordinate
    * @param y    Vertical coordinate
    */
-  public Grid(final int x, final int y) {
+  Grid(final int x, final int y) {
     super(toValue(x, y));
     positionX = x;
     positionY = y;

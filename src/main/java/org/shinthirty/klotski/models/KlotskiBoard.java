@@ -1,10 +1,14 @@
 package org.shinthirty.klotski.models;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -59,11 +63,36 @@ public class KlotskiBoard {
   private Map<String, Block> blocks;
 
   /**
+   * Occupied grids of current Klotski board.
+   */
+  private int occupied;
+
+  /**
+   * Previous configuration of Klotski puzzle.
+   */
+  private KlotskiBoard prev;
+
+  /**
    * Constructor.
    */
   private KlotskiBoard() {
     hash = 0;
     blocks = new HashMap<>();
+    occupied = 0;
+  }
+
+  /**
+   * Copy constructor.
+   *
+   * @param other    Another KlotskiBoard
+   */
+  private KlotskiBoard(final KlotskiBoard other) {
+    hash = 0;
+    blocks = new HashMap<>();
+    occupied = 0;
+    prev = other.prev;
+    Map<String, Block> otherBlocks = other.getBlocks();
+    otherBlocks.forEach((name, block) -> blocks.put(name, new Block(block)));
   }
 
   /**
@@ -73,6 +102,63 @@ public class KlotskiBoard {
    */
   public boolean isSolved() {
     return targetBlock.equals(blocks.get(target));
+  }
+
+  /**
+   * Determine if specified block can legally move along specified direction.
+   *
+   * @param name         Name of the block
+   * @param direction    Direction of the block is moving towards
+   * @return             {@link Boolean}
+   */
+  public boolean canMove(String name, Direction direction) {
+    Block block = blocks.get(name);
+
+    if (direction == Direction.UP && block.overlap(top)) {
+      return false;
+    }
+
+    if (direction == Direction.RIGHT && block.overlap(right)) {
+      return false;
+    }
+
+    if (direction == Direction.DOWN && block.overlap(bottom)) {
+      return false;
+    }
+
+    if (direction == Direction.LEFT && block.overlap(left)) {
+      return false;
+    }
+
+    int occupiedWithoutCurrent = getOccupied() & ~block.getValue();
+    return (occupiedWithoutCurrent & block.attemptMove(direction)) == 0;
+  }
+
+  /**
+   * Get a bitboard value representing the occupied grids on the Klotski board.
+   *
+   * @return    {@link Bitboard} value
+   */
+  private int getOccupied() {
+    if (occupied == 0) {
+      occupied = Bitboard.combine(blocks.values());
+    }
+
+    return occupied;
+  }
+
+  /**
+   * Create a new Klotski board by moving a block towards certain direction.
+   *
+   * @param name         Name of the block
+   * @param direction    Direction of the block is moving towards
+   * @return             {@link KlotskiBoard}
+   */
+  public KlotskiBoard move(String name, Direction direction) {
+    KlotskiBoard after = new KlotskiBoard(this);
+    after.getBlocks().get(name).move(direction);
+    after.setPrev(this);
+    return after;
   }
 
   /**
@@ -179,5 +265,39 @@ public class KlotskiBoard {
     }
 
     return h;
+  }
+
+  @Override
+  public String toString() {
+    String[] grids = new String[Bitboard.width * Bitboard.height];
+
+    blocks.forEach((name, block) -> {
+      for (int y = 0; y < Bitboard.height; y++) {
+        for (int x = 0; x < Bitboard.width; x++) {
+          if ((block.getValue() & Bitboard.toValue(x, y)) != 0) {
+            grids[Bitboard.getIndex(x, y)] = name;
+          }
+        }
+      }
+    });
+
+    ByteArrayOutputStream os = new ByteArrayOutputStream();
+    try (PrintWriter pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(os)))) {
+      for (int y = 0; y < Bitboard.height; y++) {
+        for (int x = 0; x < Bitboard.width; x++) {
+          String element = grids[Bitboard.getIndex(x, y)];
+          if (element == null) {
+            element = ".";
+          }
+
+          pw.format(" %s", element);
+        }
+
+        pw.print('\n');
+        pw.println();
+      }
+    }
+
+    return new String(os.toByteArray(), StandardCharsets.UTF_8);
   }
 }

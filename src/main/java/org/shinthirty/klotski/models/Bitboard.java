@@ -36,7 +36,7 @@ public class Bitboard {
    * @param other    {@link Bitboard} object
    * @return         {@link Boolean} true if overlap occurs
    */
-  public boolean overlap(final Bitboard other) {
+  boolean overlap(final Bitboard other) {
     return (value & other.getValue()) != 0;
   }
 
@@ -47,7 +47,7 @@ public class Bitboard {
    * @param y    Vertical coordinate
    * @return     Bitboard value
    */
-  public static int toValue(final int x, final int y) {
+  static int toValue(final int x, final int y) {
     return 1 << getIndex(x, y);
   }
 
@@ -58,7 +58,7 @@ public class Bitboard {
    * @param y    Vertical coordinate
    * @return     Bitboard index
    */
-  public static int getIndex(final int x, final int y) {
+  static int getIndex(final int x, final int y) {
     return x + y * width;
   }
 
@@ -68,7 +68,7 @@ public class Bitboard {
    * @param boards    Bitboards to be combined.
    * @return          The combined bitboard value.
    */
-  public static int combine(final Collection<? extends Bitboard> boards) {
+  static int combine(final Collection<? extends Bitboard> boards) {
     int value = 0;
     for (Bitboard board : boards) {
       value |= board.getValue();
@@ -88,7 +88,7 @@ public class Bitboard {
    * @param height   Height of the area
    * @return
    */
-  public static Bitboard draw(final int x, final int y, final int width, final int height) {
+  static Bitboard draw(final int x, final int y, final int width, final int height) {
     int value = 0;
     for (int i = x; i < x + width; i++) {
       for (int j = y; j < y + height; j++) {

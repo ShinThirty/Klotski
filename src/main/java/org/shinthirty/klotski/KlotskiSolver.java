@@ -1,11 +1,17 @@
 package org.shinthirty.klotski;
 
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.Set;
 import org.shinthirty.klotski.models.Direction;
 import org.shinthirty.klotski.models.KlotskiBoard;
@@ -18,19 +24,14 @@ import org.shinthirty.klotski.models.KlotskiBoard;
 public class KlotskiSolver {
 
   /**
-   * Klotski puzzle to be solved.
-   */
-  private KlotskiBoard puzzle;
-
-  /**
    * Visited set.
    */
   private Set<KlotskiBoard> visited;
 
   /**
-   * Container for searching the state-space.
+   * Unvisited queue.
    */
-  private Queue<KlotskiBoard> queue;
+  private Deque<KlotskiBoard> unvisited;
 
   /**
    * Constructor.
@@ -38,11 +39,9 @@ public class KlotskiSolver {
    * @param configuration    Initial configuration of klotski
    */
   public KlotskiSolver(String configuration) {
-    puzzle = KlotskiBoard.parse(configuration);
     visited = new HashSet<>(65536);
-    visited.add(puzzle);
-    queue = new LinkedList<>();
-    queue.add(puzzle);
+    unvisited = new ArrayDeque<>();
+    unvisited.add(KlotskiBoard.parse(configuration));
   }
 
   /**
@@ -69,7 +68,58 @@ public class KlotskiSolver {
    * Solve the puzzle and display the steps.
    */
   public void solve() {
+    KlotskiBoard current;
 
+    while (!unvisited.isEmpty()) {
+      current = unvisited.poll();
+
+      if (current.isSolved()) {
+        generateSolution(current);
+        break;
+      }
+
+      Collection<KlotskiBoard> nextPuzzles = nextBoards(current);
+      nextPuzzles.forEach(puzzle -> {
+        if (!visited.contains(puzzle)) {
+          unvisited.add(puzzle);
+        }
+      });
+
+      visited.add(current);
+    }
+  }
+
+  /**
+   * Generate the solution steps.
+   *
+   * @param solution    Solved KlotskiBoard
+   */
+  private void generateSolution(KlotskiBoard solution) {
+    Deque<KlotskiBoard> steps = new ArrayDeque<>();
+
+    KlotskiBoard current = solution;
+    while (current != null) {
+      steps.push(current);
+      current = current.getPrev();
+    }
+
+    try (PrintWriter pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
+        new FileOutputStream("solution.txt"), StandardCharsets.UTF_8)))) {
+      int step = 1;
+      pw.println("Solution");
+      pw.println();
+
+      while (!steps.isEmpty()) {
+        current = steps.pop();
+
+        pw.format("%d.\n", step);
+        pw.println(current.toString());
+        pw.println();
+        step++;
+      }
+    } catch (FileNotFoundException ex) {
+      ex.printStackTrace();
+    }
   }
 
 }

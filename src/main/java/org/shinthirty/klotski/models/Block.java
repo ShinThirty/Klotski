@@ -24,7 +24,7 @@ public class Block extends Bitboard {
   /**
    * Create an empty block.
    */
-  public Block() {
+  Block() {
     super(0);
     positionX = Integer.MAX_VALUE;
     positionY = Integer.MAX_VALUE;
@@ -35,7 +35,7 @@ public class Block extends Bitboard {
    *
    * @param other    Another block
    */
-  public Block(final Block other) {
+  Block(final Block other) {
     super(other.getValue());
     positionX = other.getPositionX();
     positionY = other.getPositionY();
@@ -46,7 +46,7 @@ public class Block extends Bitboard {
    *
    * @param grid    Grid to be added
    */
-  public void addGrid(Grid grid) {
+  void addGrid(Grid grid) {
     setValue(getValue() | grid.getValue());
     if (grid.getPositionX() < positionX) {
       positionX = grid.getPositionX();
@@ -57,13 +57,13 @@ public class Block extends Bitboard {
   }
 
   /**
-   * Attempt move myself x units right and y units bottom.
+   * Attempt to move myself x units right and y units bottom.
    *
    * @param x    Distance towards right
    * @param y    Distance towards bottom
    * @return     New block position represented by the bitboard value.
    */
-  public int attemptMove(final int x, final int y) {
+  private int attemptMove(final int x, final int y) {
     int shift = getIndex(x, y);
     if (shift >= 0) {
       return getValue() << shift;
@@ -73,17 +73,36 @@ public class Block extends Bitboard {
   }
 
   /**
+   * Attempt to move myself towards a certain direction.
+   *
+   * @param direction    Direction
+   * @return             New block position represented by the bitboard value.
+   */
+  int attemptMove(final Direction direction) {
+    return attemptMove(direction.x, direction.y);
+  }
+
+  /**
    * Move myself x units right and y units bottom.
    *
    * @param x    Distance towards right
    * @param y    Distance towards bottom
    * @return     New block position represented by the bitboard value.
    */
-  public void move(final int x, final int y) {
+  void move(final int x, final int y) {
     int value = attemptMove(x, y);
     positionX += x;
     positionY += y;
     setValue(value);
+  }
+
+  /**
+   * Move myself towards a certain direction.
+   *
+   * @param direction    Direction
+   */
+  void move(final Direction direction) {
+    move(direction.x, direction.y);
   }
 
   @Override
