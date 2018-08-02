@@ -196,7 +196,7 @@ public class KlotskiBoard {
    *
    * @return    {@link Long}
    */
-  public Long hash() {
+  public long hash() {
     String[] grids = getGrids();
 
     if (hash == 0) {

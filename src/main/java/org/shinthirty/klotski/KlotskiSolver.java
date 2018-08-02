@@ -66,7 +66,11 @@ class KlotskiSolver {
     for (String name : current.getBlocks().keySet()) {
       for (Direction direction : Direction.values()) {
         if (current.canMove(name, direction)) {
-          nextBoards.add(current.move(name, direction));
+          KlotskiBoard next = current.move(name, direction);
+          if (!visited.contains(next.hash())) {
+            nextBoards.add(next);
+            visited.add(next.hash());
+          }
         }
       }
     }
@@ -87,13 +91,7 @@ class KlotskiSolver {
         break;
       }
 
-      Collection<KlotskiBoard> nextPuzzles = nextBoards(current);
-      nextPuzzles.forEach(puzzle -> {
-        if (!visited.contains(puzzle.hash())) {
-          unvisited.add(puzzle);
-          visited.add(puzzle.hash());
-        }
-      });
+      unvisited.addAll(nextBoards(current));
     }
   }
 
