@@ -10,7 +10,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import lombok.Data;
 
@@ -53,14 +55,19 @@ public class KlotskiBoard {
   public static Bitboard left;
 
   /**
-   * Hash code for the Klotski board.
+   * Hash value for the Klotski board.
    */
-  private int hash;
+  private long hash;
 
   /**
    * Current state of the puzzle represented by a collection of blocks.
    */
   private Map<String, Block> blocks;
+
+  /**
+   * Board configuration by grids.
+   */
+  private String[] grids;
 
   /**
    * Occupied grids of current Klotski board.
@@ -162,6 +169,47 @@ public class KlotskiBoard {
   }
 
   /**
+   * Generate board configuration by grids.
+   *
+   * @return    {@link String[]}
+   */
+  private String[] getGrids() {
+    if (grids == null) {
+      grids = new String[Bitboard.width * Bitboard.height];
+
+      blocks.forEach((name, block) -> {
+        for (int y = 0; y < Bitboard.height; y++) {
+          for (int x = 0; x < Bitboard.width; x++) {
+            if ((block.getValue() & Bitboard.toValue(x, y)) != 0) {
+              grids[Bitboard.getIndex(x, y)] = name;
+            }
+          }
+        }
+      });
+    }
+
+    return grids;
+  }
+
+  /**
+   * Get a long value representing current status of the board.
+   *
+   * @return    {@link Long}
+   */
+  public Long hash() {
+    String[] grids = getGrids();
+
+    if (hash == 0) {
+      for (String grid : grids) {
+        byte index = grid != null ? blocks.get(grid).getIndex() : 0;
+        hash = hash << 3 | index;
+      }
+    }
+
+    return hash;
+  }
+
+  /**
    * Parse the following string to a {@link KlotskiBoard}
    *
    * 4 3
@@ -217,6 +265,8 @@ public class KlotskiBoard {
         }
       }
 
+      klotskiBoard.initializeBlockIndex();
+
       target = br.readLine();
       line = br.readLine();
       String[] targetPosition = line.split(" ");
@@ -233,54 +283,32 @@ public class KlotskiBoard {
     return klotskiBoard;
   }
 
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == null || getClass() != obj.getClass()) {
-      return false;
-    }
-
-    KlotskiBoard other = (KlotskiBoard) obj;
-    if (blocks.size() != other.getBlocks().size()) {
-      return false;
-    }
-
-    for (String name : blocks.keySet()) {
-      if (!blocks.get(name).equals(other.getBlocks().get(name))) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  @Override
-  public int hashCode() {
-    int h = hash;
-    if (h == 0) {
-      for (Block block : blocks.values()) {
-        h = 31 * h + (block == null ? 0 : block.hashCode());
+  /**
+   * Initialize block indexes.
+   */
+  private void initializeBlockIndex() {
+    Map<Integer, List<Block>> blockEigenvalues = new HashMap<>();
+    blocks.forEach((name, block) -> {
+      int eigenvalue = block.eigenvalue();
+      if (!blockEigenvalues.containsKey(eigenvalue)) {
+        blockEigenvalues.put(eigenvalue, new ArrayList<>());
       }
 
-      hash = h;
-    }
+      blockEigenvalues.get(eigenvalue).add(block);
+    });
 
-    return h;
+    byte index = 1;
+    for (List<Block> blockList : blockEigenvalues.values()) {
+      for (Block block : blockList) {
+        block.setIndex(index);
+      }
+      index++;
+    }
   }
 
   @Override
   public String toString() {
-    String[] grids = new String[Bitboard.width * Bitboard.height];
-
-    blocks.forEach((name, block) -> {
-      for (int y = 0; y < Bitboard.height; y++) {
-        for (int x = 0; x < Bitboard.width; x++) {
-          if ((block.getValue() & Bitboard.toValue(x, y)) != 0) {
-            grids[Bitboard.getIndex(x, y)] = name;
-          }
-        }
-      }
-    });
-
+    String[] grids = getGrids();
     ByteArrayOutputStream os = new ByteArrayOutputStream();
     try (PrintWriter pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(os)))) {
       for (int y = 0; y < Bitboard.height; y++) {

@@ -26,7 +26,7 @@ class KlotskiSolver {
   /**
    * Visited set.
    */
-  private Set<KlotskiBoard> visited;
+  private Set<Long> visited;
 
   /**
    * Unvisited queue.
@@ -47,7 +47,10 @@ class KlotskiSolver {
   KlotskiSolver(String configuration, String outputFile) {
     visited = new HashSet<>(65536);
     unvisited = new ArrayDeque<>();
-    unvisited.add(KlotskiBoard.parse(configuration));
+
+    KlotskiBoard puzzle = KlotskiBoard.parse(configuration);
+    unvisited.add(puzzle);
+    visited.add(puzzle.hash());
     this.outputFile = outputFile;
   }
 
@@ -79,7 +82,6 @@ class KlotskiSolver {
 
     while (!unvisited.isEmpty()) {
       current = unvisited.poll();
-
       if (current.isSolved()) {
         generateSolution(current);
         break;
@@ -87,12 +89,11 @@ class KlotskiSolver {
 
       Collection<KlotskiBoard> nextPuzzles = nextBoards(current);
       nextPuzzles.forEach(puzzle -> {
-        if (!visited.contains(puzzle)) {
+        if (!visited.contains(puzzle.hash())) {
           unvisited.add(puzzle);
+          visited.add(puzzle.hash());
         }
       });
-
-      visited.add(current);
     }
   }
 

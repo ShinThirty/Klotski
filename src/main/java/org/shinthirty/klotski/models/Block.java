@@ -22,6 +22,11 @@ public class Block extends Bitboard {
   private int positionY;
 
   /**
+   * Index of the block, representing the shape of the block.
+   */
+  private byte index;
+
+  /**
    * Create an empty block.
    */
   Block() {
@@ -39,6 +44,7 @@ public class Block extends Bitboard {
     super(other.getValue());
     positionX = other.getPositionX();
     positionY = other.getPositionY();
+    index = other.getIndex();
   }
 
   /**
@@ -80,6 +86,16 @@ public class Block extends Bitboard {
    */
   int attemptMove(final Direction direction) {
     return attemptMove(direction.x, direction.y);
+  }
+
+  /**
+   * Get the eigenvalue of the block. One kind of block only has one eigenvalue which represents
+   * its shape.
+   *
+   * @return    {@link Integer}
+   */
+  int eigenvalue() {
+    return attemptMove(-positionX, -positionY);
   }
 
   /**
