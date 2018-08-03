@@ -98,19 +98,25 @@ class KlotskiSolver {
 
   /**
    * Solve the puzzle and display the steps.
+   *
    */
   void solve() {
     KlotskiBoard current;
 
+    int total = 0;
+    int numberOfSteps = 0;
     while (!unvisited.isEmpty()) {
       current = unvisited.poll();
+      total++;
       if (current.isSolved()) {
-        generateSolution(current);
+        numberOfSteps = generateSolution(current);
         break;
       }
 
       unvisited.addAll(nextBoards(current));
     }
+
+    System.out.format("%d steps, %d explored%n", numberOfSteps, total);
   }
 
   /**
@@ -118,7 +124,7 @@ class KlotskiSolver {
    *
    * @param solution    Solved KlotskiBoard
    */
-  private void generateSolution(final KlotskiBoard solution) {
+  private int generateSolution(final KlotskiBoard solution) {
     Deque<KlotskiBoard> steps = new ArrayDeque<>();
 
     KlotskiBoard current = solution;
@@ -126,6 +132,8 @@ class KlotskiSolver {
       steps.push(current);
       current = current.getPrev();
     }
+
+    int numberOfSteps = steps.size() - 1;
 
     try (PrintWriter pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
         new FileOutputStream(outputFile), StandardCharsets.UTF_8)))) {
@@ -141,6 +149,8 @@ class KlotskiSolver {
     } catch (FileNotFoundException ex) {
       ex.printStackTrace();
     }
+
+    return numberOfSteps;
   }
 
 }

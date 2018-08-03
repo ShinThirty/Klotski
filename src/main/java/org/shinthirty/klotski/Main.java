@@ -28,6 +28,8 @@ public class Main implements Runnable {
    * @param args    Command line arguments
    */
   public static void main(final String[] args) {
+    long startTime = System.currentTimeMillis();
+
     Main main = new Main();
     JCommander jc = JCommander.newBuilder().addObject(main).build();
     try {
@@ -38,6 +40,10 @@ public class Main implements Runnable {
     }
 
     main.run();
+
+    long stopTime = System.currentTimeMillis();
+    long elapsedTime = stopTime - startTime;
+    System.out.format("%dms elapsed%n", elapsedTime);
   }
 
   @Override
