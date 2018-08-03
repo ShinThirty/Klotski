@@ -52,7 +52,7 @@ public class Block extends Bitboard {
    *
    * @param grid    Grid to be added
    */
-  void addGrid(Grid grid) {
+  void addGrid(final Grid grid) {
     setValue(getValue() | grid.getValue());
     if (grid.getPositionX() < positionX) {
       positionX = grid.getPositionX();
@@ -122,7 +122,7 @@ public class Block extends Bitboard {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(final Object obj) {
     if (obj == null) {
       return false;
     }

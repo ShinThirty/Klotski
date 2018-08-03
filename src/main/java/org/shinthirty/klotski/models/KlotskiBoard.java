@@ -118,7 +118,7 @@ public class KlotskiBoard {
    * @param direction    Direction of the block is moving towards
    * @return             {@link Boolean}
    */
-  public boolean canMove(String name, Direction direction) {
+  public boolean canMove(final String name, final Direction direction) {
     Block block = blocks.get(name);
 
     if (direction == Direction.UP && block.overlap(top)) {
@@ -161,7 +161,7 @@ public class KlotskiBoard {
    * @param direction    Direction of the block is moving towards
    * @return             {@link KlotskiBoard}
    */
-  public KlotskiBoard move(String name, Direction direction) {
+  public KlotskiBoard move(final String name, final Direction direction) {
     KlotskiBoard after = new KlotskiBoard(this);
     after.getBlocks().get(name).move(direction);
     after.setPrev(this);

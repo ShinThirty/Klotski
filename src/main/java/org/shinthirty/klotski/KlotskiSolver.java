@@ -44,7 +44,7 @@ class KlotskiSolver {
    * @param configuration    Initial configuration of klotski
    * @param outputFile       Output file path
    */
-  KlotskiSolver(String configuration, String outputFile) {
+  KlotskiSolver(final String configuration, final String outputFile) {
     visited = new HashSet<>(65536);
     unvisited = new ArrayDeque<>();
 
@@ -60,22 +60,40 @@ class KlotskiSolver {
    * @param current    Current puzzle board
    * @return           Next possible puzzle boards
    */
-  private Collection<KlotskiBoard> nextBoards(KlotskiBoard current) {
+  private Collection<KlotskiBoard> nextBoards(final KlotskiBoard current) {
     List<KlotskiBoard> nextBoards = new ArrayList<>();
 
     for (String name : current.getBlocks().keySet()) {
-      for (Direction direction : Direction.values()) {
-        if (current.canMove(name, direction)) {
-          KlotskiBoard next = current.move(name, direction);
-          if (!visited.contains(next.hash())) {
-            nextBoards.add(next);
-            visited.add(next.hash());
-          }
+      findNextBoards(current, name, nextBoards);
+    }
+
+    nextBoards.forEach(nextBoard -> nextBoard.setPrev(current));
+    return nextBoards;
+  }
+
+  /**
+   * Find out all next klotski boards reachable by moving the named block from the current klotski
+   * board.
+   *
+   * @param current       Current klotski board
+   * @param name          Name of the block to be moved
+   * @param nextBoards    Reachable next boards
+   */
+  private void findNextBoards(final KlotskiBoard current, final String name,
+      final List<KlotskiBoard> nextBoards) {
+    List<KlotskiBoard> nexts = new ArrayList<>();
+    for (Direction direction : Direction.values()) {
+      if (current.canMove(name, direction)) {
+        KlotskiBoard next = current.move(name, direction);
+        if (!visited.contains(next.hash())) {
+          nexts.add(next);
+          nextBoards.add(next);
+          visited.add(next.hash());
         }
       }
     }
 
-    return nextBoards;
+    nexts.forEach(next -> findNextBoards(next, name, nextBoards));
   }
 
   /**
@@ -100,7 +118,7 @@ class KlotskiSolver {
    *
    * @param solution    Solved KlotskiBoard
    */
-  private void generateSolution(KlotskiBoard solution) {
+  private void generateSolution(final KlotskiBoard solution) {
     Deque<KlotskiBoard> steps = new ArrayDeque<>();
 
     KlotskiBoard current = solution;

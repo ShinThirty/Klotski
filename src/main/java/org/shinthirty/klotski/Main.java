@@ -27,7 +27,7 @@ public class Main implements Runnable {
    *
    * @param args    Command line arguments
    */
-  public static void main(String[] args) {
+  public static void main(final String[] args) {
     Main main = new Main();
     JCommander jc = JCommander.newBuilder().addObject(main).build();
     try {
