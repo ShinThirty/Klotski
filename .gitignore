@@ -28,3 +28,9 @@ hs_err_pid*
 
 # Maven build artifacts
 target
+
+# VS Code files
+.settings
+.classpath
+.factorypath
+.project
